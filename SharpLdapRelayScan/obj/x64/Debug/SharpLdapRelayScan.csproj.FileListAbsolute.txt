@@ -1,0 +1,9 @@
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\bin\x64\Debug\SharpLdapRelayScan.exe.config
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\bin\x64\Debug\SharpLdapRelayScan.exe
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\bin\x64\Debug\SharpLdapRelayScan.pdb
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\bin\x64\Debug\CommandLine.dll
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\bin\x64\Debug\CommandLine.xml
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\obj\x64\Debug\SharpLdapRelayScan.csproj.CoreCompileInputs.cache
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\obj\x64\Debug\SharpLdapRelayScan.csproj.CopyComplete
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\obj\x64\Debug\SharpLdapRelayScan.exe
+C:\Users\d3adc0de\source\repos\SharpLdapRelayScan\SharpLdapRelayScan\obj\x64\Debug\SharpLdapRelayScan.pdb
