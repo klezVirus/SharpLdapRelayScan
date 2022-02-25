@@ -55,17 +55,21 @@ namespace SharpLdapRelayScan
             ldapHost = ldapURI.Host + (ldapURI.Port == 0 ? "" : ":" + ldapURI.Port);
            
             //Bind function will Bind the user object  Credentials to the Server
-            // Call 1 -- Check if SSL Signing is in place (valid creds required)
-            ldapConn.Bind();
+            // -- Check if SSL Signing is in place (valid creds required)
+            int errCode = ldapConn.Bind();
 
-            // Call 2 -- Validate credentials
-            bool validCreds = Validate(ldapHost, domain, username, password, ldapPort, verbose);
-
-            if (!ldapConn.EnforceSslSigning && validCreds) {
-                Console.WriteLine("    [+] LDAP Signing not required! Yeah!");
-            } else if (!ldapConn.EnforceSslSigning) 
-            {
+            bool validCreds = (errCode == 8 || errCode == 0);
+            
+            // This call is unuseful, and a second login attempt
+            // Validate(ldapHost, domain, username, password, ldapPort, verbose);
+            
+            if (!validCreds) {
                 Console.WriteLine("    [/] The credentials provided seems ivalid.");
+                return;
+            }
+
+            if (!ldapConn.EnforceSslSigning) {
+                Console.WriteLine("    [+] LDAP Signing not required! Yeah!");
             } 
             else 
             {
@@ -91,9 +95,11 @@ namespace SharpLdapRelayScan
             try
             {
                 ldapConn.Bind(dn, password);
+                // Successful Binding
+                res = true;
             }
             catch (LdapException ex) {
-                if (ex.ResultCode == 8) {
+                if (ex.ResultCode == 8 || ex.ResultCode == 0) {
                     res = true;
                 }
             }
