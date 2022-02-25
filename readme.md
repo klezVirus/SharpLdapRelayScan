@@ -8,6 +8,8 @@ If you're interested in the specifics of the error-based enumeration, see the ex
 
 For details regarding what can be done when you identify a lack of LDAP protections, see the [references section](https://github.com/klezVirus/SharpLdapRelayScan#references).
 
+**NOTE:** [Cube0x0](https://twitter.com/cube0x0) just released a C#/BOF version of the tool using SASL authentication which works amazingly. Check it out [HERE](https://github.com/cube0x0/LdapSignCheck)!
+
 ## Usage
 
 > Note: DNS needs to resolve properly. If you are routing through SOCKS or running on a non-domain-joined host, ensure this is working.
