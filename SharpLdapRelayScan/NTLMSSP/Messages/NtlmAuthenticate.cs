@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
-using SharpLdapRelayScan.SPNEGO.Structs;
-using Version = SharpLdapRelayScan.SPNEGO.Structs.Version;
+using SharpLdapRelayScan.NTLMSSP.Structs;
+using Version = SharpLdapRelayScan.NTLMSSP.Structs.Version;
 
-namespace SharpLdapRelayScan.SPNEGO.Messages
+namespace SharpLdapRelayScan.NTLMSSP.Messages
 {
     public class NtlmAuthenticate
     {

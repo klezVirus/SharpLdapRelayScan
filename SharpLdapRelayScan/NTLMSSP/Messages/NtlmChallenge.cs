@@ -1,12 +1,12 @@
-﻿using SharpLdapRelayScan.SPNEGO.Structs;
+﻿using SharpLdapRelayScan.NTLMSSP.Structs;
 using SharpLdapRelayScan.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Version = SharpLdapRelayScan.SPNEGO.Structs.Version;
+using Version = SharpLdapRelayScan.NTLMSSP.Structs.Version;
 
-namespace SharpLdapRelayScan.SPNEGO.Messages
+namespace SharpLdapRelayScan.NTLMSSP.Messages
 {
     public class NtlmChallenge
     {

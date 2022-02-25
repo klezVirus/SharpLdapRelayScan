@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SharpLdapRelayScan.SPNEGO.Structs
+namespace SharpLdapRelayScan.NTLMSSP.Structs
 {
     class Common
     {

@@ -7,7 +7,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Linq;
 
-namespace SharpLdapRelayScan.SPNEGO.Structs
+namespace SharpLdapRelayScan.NTLMSSP.Structs
 {
     public class NetNTLMCredentials
     {

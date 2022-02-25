@@ -32,8 +32,8 @@
 using Novell.Directory.Ldap.Asn1;
 using Novell.Directory.Ldap.Rfc2251;
 using Novell.Directory.Ldap.Utilclass;
-using SharpLdapRelayScan.SPNEGO.Messages;
-using SharpLdapRelayScan.SPNEGO.Structs;
+using SharpLdapRelayScan.NTLMSSP.Messages;
+using SharpLdapRelayScan.NTLMSSP.Structs;
 using System;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
