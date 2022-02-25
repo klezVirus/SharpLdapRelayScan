@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -31,6 +32,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -41,6 +43,7 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -51,10 +54,20 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
     <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="CommandLine, Version=2.8.0.0, Culture=neutral, PublicKeyToken=5a870481e358d379, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.2.8.0\lib\net461\CommandLine.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.CSharp">
+      <HintPath>..\..\..\..\..\..\Program Files\Mono\lib\mono\4.7.2-api\Mono.CSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security">
+      <HintPath>..\..\..\..\..\..\Program Files\Mono\lib\mono\4.7.2-api\Mono.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="Mono.Security.Win32">
+      <HintPath>..\..\..\..\..\..\Program Files\Mono\lib\mono\4.7.2-api\Mono.Security.Win32.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -69,19 +82,246 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scanner\LdapsTest.cs" />
+    <Compile Include="Novell\Asn1\Asn1Boolean.cs" />
+    <Compile Include="Novell\Asn1\Asn1Choice.cs" />
+    <Compile Include="Novell\Asn1\Asn1Decoder.cs" />
+    <Compile Include="Novell\Asn1\Asn1Encoder.cs" />
+    <Compile Include="Novell\Asn1\Asn1Enumerated.cs" />
+    <Compile Include="Novell\Asn1\Asn1Identifier.cs" />
+    <Compile Include="Novell\Asn1\Asn1Integer.cs" />
+    <Compile Include="Novell\Asn1\Asn1Length.cs" />
+    <Compile Include="Novell\Asn1\Asn1Null.cs" />
+    <Compile Include="Novell\Asn1\Asn1Numeric.cs" />
+    <Compile Include="Novell\Asn1\Asn1Object.cs" />
+    <Compile Include="Novell\Asn1\Asn1OctetString.cs" />
+    <Compile Include="Novell\Asn1\Asn1Sequence.cs" />
+    <Compile Include="Novell\Asn1\Asn1SequenceOf.cs" />
+    <Compile Include="Novell\Asn1\Asn1Set.cs" />
+    <Compile Include="Novell\Asn1\Asn1SetOf.cs" />
+    <Compile Include="Novell\Asn1\Asn1Structured.cs" />
+    <Compile Include="Novell\Asn1\Asn1Tagged.cs" />
+    <Compile Include="Novell\Asn1\LBERDecoder.cs" />
+    <Compile Include="Novell\Asn1\LBEREncoder.cs" />
+    <Compile Include="Novell\Connection.cs" />
+    <Compile Include="Novell\Controls\LdapEntryChangeControl.cs" />
+    <Compile Include="Novell\Controls\LdapPagedResultsControl.cs" />
+    <Compile Include="Novell\Controls\LdapPagedResultsResponse.cs" />
+    <Compile Include="Novell\Controls\LdapPersistSearchControl.cs" />
+    <Compile Include="Novell\Controls\LdapSortControl.cs" />
+    <Compile Include="Novell\Controls\LdapSortKey.cs" />
+    <Compile Include="Novell\Controls\LdapSortResponse.cs" />
+    <Compile Include="Novell\Controls\LdapVirtualListControl.cs" />
+    <Compile Include="Novell\Controls\LdapVirtualListResponse.cs" />
+    <Compile Include="Novell\Events\BaseEventArgs.cs" />
+    <Compile Include="Novell\Events\DirectoryEventArgs.cs" />
+    <Compile Include="Novell\Events\DirectoryExceptionEventArgs.cs" />
+    <Compile Include="Novell\Events\Edir\EdirEventArgs.cs" />
+    <Compile Include="Novell\Events\Edir\EdirEventConstants.cs" />
+    <Compile Include="Novell\Events\Edir\EdirEventIntermediateResponse.cs" />
+    <Compile Include="Novell\Events\Edir\EdirEventSource.cs" />
+    <Compile Include="Novell\Events\Edir\EdirEventSpecifier.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\BaseEdirEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\BinderyObjectEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\ChangeAddressEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\ConnectionStateEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\DebugEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\DebugParameter.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\DSETimeStamp.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\EntryEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\GeneralDSEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\ModuleStateEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\NetworkAddressEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\ReferralAddress.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\SecurityEquivalenceEventData.cs" />
+    <Compile Include="Novell\Events\Edir\EventData\ValueEventData.cs" />
+    <Compile Include="Novell\Events\Edir\MonitorEventRequest.cs" />
+    <Compile Include="Novell\Events\Edir\MonitorEventResponse.cs" />
+    <Compile Include="Novell\Events\LdapEventArgs.cs" />
+    <Compile Include="Novell\Events\LdapEventConstants.cs" />
+    <Compile Include="Novell\Events\LdapEventSource.cs" />
+    <Compile Include="Novell\Events\PSearchEventSource.cs" />
+    <Compile Include="Novell\Events\SearchReferralEventArgs.cs" />
+    <Compile Include="Novell\Events\SearchResultEventArgs.cs" />
+    <Compile Include="Novell\Extensions\AbortPartitionOperationRequest.cs" />
+    <Compile Include="Novell\Extensions\AddReplicaRequest.cs" />
+    <Compile Include="Novell\Extensions\BackupRestoreConstants.cs" />
+    <Compile Include="Novell\Extensions\ChangeReplicaTypeRequest.cs" />
+    <Compile Include="Novell\Extensions\GetBindDNRequest.cs" />
+    <Compile Include="Novell\Extensions\GetBindDNResponse.cs" />
+    <Compile Include="Novell\Extensions\GetEffectivePrivilegesListRequest.cs" />
+    <Compile Include="Novell\Extensions\GetEffectivePrivilegesListResponse.cs" />
+    <Compile Include="Novell\Extensions\GetEffectivePrivilegesRequest.cs" />
+    <Compile Include="Novell\Extensions\GetEffectivePrivilegesResponse.cs" />
+    <Compile Include="Novell\Extensions\GetReplicaInfoRequest.cs" />
+    <Compile Include="Novell\Extensions\GetReplicaInfoResponse.cs" />
+    <Compile Include="Novell\Extensions\GetReplicationFilterRequest.cs" />
+    <Compile Include="Novell\Extensions\GetReplicationFilterResponse.cs" />
+    <Compile Include="Novell\Extensions\LdapBackupRequest.cs" />
+    <Compile Include="Novell\Extensions\LdapBackupResponse.cs" />
+    <Compile Include="Novell\Extensions\LdapRestoreRequest.cs" />
+    <Compile Include="Novell\Extensions\ListReplicasRequest.cs" />
+    <Compile Include="Novell\Extensions\ListReplicasResponse.cs" />
+    <Compile Include="Novell\Extensions\MergePartitionsRequest.cs" />
+    <Compile Include="Novell\Extensions\NamingContextConstants.cs" />
+    <Compile Include="Novell\Extensions\PartitionEntryCountRequest.cs" />
+    <Compile Include="Novell\Extensions\PartitionEntryCountResponse.cs" />
+    <Compile Include="Novell\Extensions\PartitionSyncRequest.cs" />
+    <Compile Include="Novell\Extensions\ReceiveAllUpdatesRequest.cs" />
+    <Compile Include="Novell\Extensions\RefreshLdapServerRequest.cs" />
+    <Compile Include="Novell\Extensions\RemoveOrphanPartitionRequest.cs" />
+    <Compile Include="Novell\Extensions\RemoveReplicaRequest.cs" />
+    <Compile Include="Novell\Extensions\ReplicationConstants.cs" />
+    <Compile Include="Novell\Extensions\SchemaSyncRequest.cs" />
+    <Compile Include="Novell\Extensions\SendAllUpdatesRequest.cs" />
+    <Compile Include="Novell\Extensions\SetReplicationFilterRequest.cs" />
+    <Compile Include="Novell\Extensions\SplitOrphanPartitionRequest.cs" />
+    <Compile Include="Novell\Extensions\SplitPartitionRequest.cs" />
+    <Compile Include="Novell\Extensions\TriggerBackgroundProcessRequest.cs" />
+    <Compile Include="Novell\InterThreadException.cs" />
+    <Compile Include="Novell\LdapAbandonRequest.cs" />
+    <Compile Include="Novell\LdapAddRequest.cs" />
+    <Compile Include="Novell\LdapAttribute.cs" />
+    <Compile Include="Novell\LdapAttributeSchema.cs" />
+    <Compile Include="Novell\LdapAttributeSet.cs" />
+    <Compile Include="Novell\LdapAuthHandler.cs" />
+    <Compile Include="Novell\LdapAuthProvider.cs" />
+    <Compile Include="Novell\LdapBindHandler.cs" />
+    <Compile Include="Novell\LdapBindRequest.cs" />
+    <Compile Include="Novell\LdapCompareAttrNames.cs" />
+    <Compile Include="Novell\LdapCompareRequest.cs" />
+    <Compile Include="Novell\LdapConnection.cs" />
+    <Compile Include="Novell\LdapConstraints.cs" />
+    <Compile Include="Novell\LdapControl.cs" />
+    <Compile Include="Novell\LdapDeleteRequest.cs" />
+    <Compile Include="Novell\LdapDITContentRuleSchema.cs" />
+    <Compile Include="Novell\LdapDITStructureRuleSchema.cs" />
+    <Compile Include="Novell\LdapDN.cs" />
+    <Compile Include="Novell\LdapDSConstants.cs" />
+    <Compile Include="Novell\LdapEntry.cs" />
+    <Compile Include="Novell\LdapException.cs" />
+    <Compile Include="Novell\LdapExtendedOperation.cs" />
+    <Compile Include="Novell\LdapExtendedRequest.cs" />
+    <Compile Include="Novell\LdapExtendedResponse.cs" />
+    <Compile Include="Novell\LdapIntermediateResponse.cs" />
+    <Compile Include="Novell\LdapLocalException.cs" />
+    <Compile Include="Novell\LdapMatchingRuleSchema.cs" />
+    <Compile Include="Novell\LdapMatchingRuleUseSchema.cs" />
+    <Compile Include="Novell\LdapMessage.cs" />
+    <Compile Include="Novell\LdapMessageQueue.cs" />
+    <Compile Include="Novell\LdapModification.cs" />
+    <Compile Include="Novell\LdapModifyDNRequest.cs" />
+    <Compile Include="Novell\LdapModifyRequest.cs" />
+    <Compile Include="Novell\LdapNameFormSchema.cs" />
+    <Compile Include="Novell\LdapObjectClassSchema.cs" />
+    <Compile Include="Novell\LdapReferralException.cs" />
+    <Compile Include="Novell\LdapReferralHandler.cs" />
+    <Compile Include="Novell\LdapResponse.cs" />
+    <Compile Include="Novell\LdapResponseQueue.cs" />
+    <Compile Include="Novell\LdapSchema.cs" />
+    <Compile Include="Novell\LdapSchemaElement.cs" />
+    <Compile Include="Novell\LdapSearchConstraints.cs" />
+    <Compile Include="Novell\LdapSearchQueue.cs" />
+    <Compile Include="Novell\LdapSearchRequest.cs" />
+    <Compile Include="Novell\LdapSearchResult.cs" />
+    <Compile Include="Novell\LdapSearchResultReference.cs" />
+    <Compile Include="Novell\LdapSearchResults.cs" />
+    <Compile Include="Novell\LdapSyntaxSchema.cs" />
+    <Compile Include="Novell\LdapUnbindRequest.cs" />
+    <Compile Include="Novell\LdapUnsolicitedNotificationListener.cs" />
+    <Compile Include="Novell\LdapUrl.cs" />
+    <Compile Include="Novell\Message.cs" />
+    <Compile Include="Novell\MessageAgent.cs" />
+    <Compile Include="Novell\MessageVector.cs" />
+    <Compile Include="Novell\Protocols\Sicily.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAbandonRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAddRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAddResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAssertionValue.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAttributeDescription.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAttributeDescriptionList.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAttributeList.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAttributeTypeAndValues.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAttributeValue.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAttributeValueAssertion.cs" />
+    <Compile Include="Novell\Rfc2251\RfcAuthenticationChoice.cs" />
+    <Compile Include="Novell\Rfc2251\RfcBindRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcBindResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcCompareRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcCompareResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcControl.cs" />
+    <Compile Include="Novell\Rfc2251\RfcControls.cs" />
+    <Compile Include="Novell\Rfc2251\RfcDelRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcDelResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcExtendedRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcExtendedResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcFilter.cs" />
+    <Compile Include="Novell\Rfc2251\RfcIntermediateResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcLdapDN.cs" />
+    <Compile Include="Novell\Rfc2251\RfcLdapMessage.cs" />
+    <Compile Include="Novell\Rfc2251\RfcLdapOID.cs" />
+    <Compile Include="Novell\Rfc2251\RfcLdapResult.cs" />
+    <Compile Include="Novell\Rfc2251\RfcLdapString.cs" />
+    <Compile Include="Novell\Rfc2251\RfcLdapURL.cs" />
+    <Compile Include="Novell\Rfc2251\RfcMatchingRuleAssertion.cs" />
+    <Compile Include="Novell\Rfc2251\RfcMatchingRuleId.cs" />
+    <Compile Include="Novell\Rfc2251\RfcMessageID.cs" />
+    <Compile Include="Novell\Rfc2251\RfcModifyDNRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcModifyDNResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcModifyRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcModifyResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcReferral.cs" />
+    <Compile Include="Novell\Rfc2251\RfcRelativeLdapDN.cs" />
+    <Compile Include="Novell\Rfc2251\RfcRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcResponse.cs" />
+    <Compile Include="Novell\Rfc2251\RfcSaslCredentials.cs" />
+    <Compile Include="Novell\Rfc2251\RfcSearchRequest.cs" />
+    <Compile Include="Novell\Rfc2251\RfcSearchResultDone.cs" />
+    <Compile Include="Novell\Rfc2251\RfcSearchResultEntry.cs" />
+    <Compile Include="Novell\Rfc2251\RfcSearchResultReference.cs" />
+    <Compile Include="Novell\Rfc2251\RfcSubstringFilter.cs" />
+    <Compile Include="Novell\Rfc2251\RfcUnbindRequest.cs" />
+    <Compile Include="Novell\SupportClass.cs" />
+    <Compile Include="Novell\Utilclass\ArrayEnumeration.cs" />
+    <Compile Include="Novell\Utilclass\AttributeQualifier.cs" />
+    <Compile Include="Novell\Utilclass\Base64.cs" />
+    <Compile Include="Novell\Utilclass\BindProperties.cs" />
+    <Compile Include="Novell\Utilclass\CharacterTypes.cs" />
+    <Compile Include="Novell\Utilclass\DN.cs" />
+    <Compile Include="Novell\Utilclass\EnumeratedIterator.cs" />
+    <Compile Include="Novell\Utilclass\ExceptionMessages.cs" />
+    <Compile Include="Novell\Utilclass\ExtResponseFactory.cs" />
+    <Compile Include="Novell\Utilclass\IntermediateResponseFactory.cs" />
+    <Compile Include="Novell\Utilclass\RDN.cs" />
+    <Compile Include="Novell\Utilclass\ReferralInfo.cs" />
+    <Compile Include="Novell\Utilclass\ResourcesHandler.cs" />
+    <Compile Include="Novell\Utilclass\RespControlVector.cs" />
+    <Compile Include="Novell\Utilclass\RespExtensionSet.cs" />
+    <Compile Include="Novell\Utilclass\ResultCodeMessages.cs" />
+    <Compile Include="Novell\Utilclass\SchemaParser.cs" />
+    <Compile Include="Novell\Utilclass\SchemaTokenCreator.cs" />
+    <Compile Include="Novell\Utilclass\TokenTypes.cs" />
     <Compile Include="Security\Common.cs" />
-    <Compile Include="Native.cs" />
-    <Compile Include="ReflectionHelper.cs" />
-    <Compile Include="DSReimpl.cs" />
+    <Compile Include="Utils\Native.cs" />
+    <Compile Include="NTLMSSP\Structs\Common.cs" />
+    <Compile Include="NTLMSSP\Messages\NtlmChallenge.cs" />
+    <Compile Include="NTLMSSP\Messages\NtlmAuthenticate.cs" />
+    <Compile Include="Utils\BinTools.cs" />
+    <Compile Include="Utils\Crypto\Crypto.cs" />
+    <Compile Include="Utils\ReflectionHelper.cs" />
+    <Compile Include="DirectoryServices\CustomLdapConnection.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Security.cs" />
     <Compile Include="Security\SecurityContext.cs" />
     <Compile Include="Security\State.cs" />
+    <Compile Include="NTLMSSP\Structs\Credentials.cs" />
+    <Compile Include="NTLMSSP\Asn1\Sicily.cs" />
+    <Compile Include="NTLMSSP\Messages\NtlmNegotiate.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

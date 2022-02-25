@@ -5,30 +5,33 @@ namespace SharpLdapRelayScan
 {
     internal class Common
     {
-#region Private constants
+        #region Private constants
 
         private const int ISC_REQ_REPLAY_DETECT = 0x00000004;
         private const int ISC_REQ_SEQUENCE_DETECT = 0x00000008;
         private const int ISC_REQ_CONFIDENTIALITY = 0x00000010;
         private const int ISC_REQ_CONNECTION = 0x00000800;
+        private const int ISC_REQ_MUTUAL_AUTH = 0x00000002;
 
-#endregion
+        #endregion
 
         internal static uint NewContextAttributes = 0;
         internal static SecurityInteger NewLifeTime = new SecurityInteger(0);
 
-#region internal constants
+        #region internal constants
 
-        internal const int StandardContextAttributes = ISC_REQ_CONFIDENTIALITY | ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_CONNECTION;
+        internal const int StandardContextAttributes = ISC_REQ_CONFIDENTIALITY | ISC_REQ_REPLAY_DETECT | ISC_REQ_SEQUENCE_DETECT | ISC_REQ_CONNECTION | ISC_REQ_MUTUAL_AUTH;
         internal const int SecurityNativeDataRepresentation = 0x10;
         internal const int MaximumTokenSize = 12288;
+        internal const int SecurityCredentialsInbound = 1;
         internal const int SecurityCredentialsOutbound = 2;
+        internal const int SecurityCredentialsMutual = 3;
         internal const int SuccessfulResult = 0;
         internal const int IntermediateResult = 0x90312;
 
-#endregion
+        #endregion
 
-#region internal enumerations
+        #region internal enumerations
 
         internal enum SecurityBufferType
         {
@@ -89,9 +92,9 @@ namespace SharpLdapRelayScan
             NTLMv2_only,
         }
 
-#endregion
+        #endregion
 
-#region internal structures
+        #region internal structures
 
         [StructLayout(LayoutKind.Sequential)]
         internal struct SecurityHandle
@@ -277,6 +280,6 @@ namespace SharpLdapRelayScan
             }
         }
 
-#endregion
+        #endregion
     }
 }

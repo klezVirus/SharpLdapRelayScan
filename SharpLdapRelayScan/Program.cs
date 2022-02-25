@@ -1,13 +1,10 @@
-﻿using System;
+﻿using CommandLine;
+using SharpLdapRelayScan.DirectoryServices;
+using System;
 using System.Collections.Generic;
-using System.DirectoryServices;
+using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
-using System.DirectoryServices.Protocols;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using CommandLine;
 
 namespace SharpLdapRelayScan
 {
@@ -25,13 +22,13 @@ namespace SharpLdapRelayScan
             [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages")]
             public bool Verbose { get; set; }
 
-            [Option('d', "dc-ip", Required = false, Default = "10.0.10.131", HelpText = "DNS Nameserver on network. Any DC's IPv4 address should work")]
+            [Option('d', "dcip", Required = false, HelpText = "DNS Nameserver on network. Any DC's IPv4 address should work")]
             public string DomainController { get; set; }
-            
-            [Option('u', "user", Required = false, Default = "d3adc0de", HelpText = "Domain User")]
+
+            [Option('u', "user", Required = false,  HelpText = "Domain User")]
             public string Username { get; set; }
 
-            [Option('p', "password", Required = false, Default = "Passw0rd!", HelpText = "Domain User's Password")]
+            [Option('p', "password", Required = true, HelpText = "Domain User's Password")]
             public string Password { get; set; }
 
             [Option('m', "method", Required = false, Default = "Both", HelpText = "LDAPS or BOTH - LDAPS checks for channel binding, BOTH checks for LDAP signing and LDAP channel binding [authentication required]")]
@@ -49,18 +46,28 @@ namespace SharpLdapRelayScan
         static void RunOptions(Options opts)
         {
             var method = (CheckMethods)Enum.Parse(typeof(CheckMethods), opts.Method, true);
-            var credentials = new NetworkCredential(opts.Username, opts.Password);
+
             List<string> serverIds = new List<string>();
 
-
+            if (!string.IsNullOrEmpty(opts.Username))
+            {
+                opts.Username = Environment.UserName;
+            }
+            
             if (!string.IsNullOrEmpty(opts.DomainController))
             {
                 serverIds.Add(opts.DomainController);
             }
             else
             {
+                DomainControllerCollection dcCollection = GetListOfDomainControllers();
 
-                foreach (DomainController dc in GetListOfDomainControllers())
+                if (dcCollection == null || dcCollection.Count == 0) {
+                    Console.WriteLine("[-] No DC detected, are you in a domain?");
+                    return;
+                }
+
+                foreach (DomainController dc in dcCollection)
                 {
                     serverIds.Add(dc.IPAddress.ToString());
                 }
@@ -71,87 +78,87 @@ namespace SharpLdapRelayScan
             switch (method)
             {
                 case CheckMethods.Both:
-                    LdapTest(serverIds, credentials);
-                    LdapsTest(serverIds, credentials);
+                    LdapTest(serverIds, opts);
+                    NovellLdapsTest(serverIds, opts);
                     break;
                 case CheckMethods.Ldaps:
-                    LdapsTest(serverIds, credentials);
+                    NovellLdapsTest(serverIds, opts);
                     break;
                 default:
                     break;
             }
         }
 
-        private static void LdapsTest(List<string> serverIds, NetworkCredential credentials)
-        {
-            foreach(string serverId_s in serverIds)
-            {
-                try
-                {
-                    var serverId = new LdapDirectoryIdentifier(serverId_s, 636);
-
-                    Console.WriteLine("[*] Testing {0}", serverId.Servers[0]);
-                    var conn = new LdapConnection(serverId, credentials) {
-                        AuthType = AuthType.Ntlm,
-                        SessionOptions =
-                        {
-                            ProtocolVersion = 3,
-                            SecureSocketLayer = true
-
-                }
-                    };
-                    conn.SessionOptions.VerifyServerCertificate += (sender, certificate) => true;
-                    int errCode = -1;
-                    try
-                    {
-                        errCode = DSReimpl.LdapsBind2(conn, credentials, false);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("[-] Connection Error: {0}", e.StackTrace);
-                    }
-                    if (errCode == 8)
-                    {
-                        Console.WriteLine("[-] LDAP Signing required. That sucks...");
-                    }
-                    else
-                    {
-                        Console.WriteLine("[-] LDAP Signing not required! Yeah!");
-                    }
-                    conn.Dispose();
-                }
-                catch (Exception e){
-                    Console.WriteLine("  [-] Exception: {0}. Skipping", e.Message);
-                }
-            }
-        }
-
-        private static void LdapTest(List<string> serverIds, NetworkCredential credentials)
+        private static void LdapsTest(List<string> serverIds, Options options)
         {
             foreach (string serverId_s in serverIds)
             {
                 try
                 {
-                    var serverId = new LdapDirectoryIdentifier(serverId_s);
-                    
-                    Console.WriteLine("[*] Testing {0}", serverId.Servers[0]);
-                    var conn = new LdapConnection(serverId, credentials, AuthType.Sicily);
+                    Console.WriteLine("[*] Testing {0}", serverId_s);
+                    var conn = new CustomLdapConnection(serverId_s, options.Username, Environment.UserDomainName, options.Password, true);
                     int errCode = -1;
                     try
                     {
-                        errCode = DSReimpl.Bind(conn, credentials, false);
+                        errCode = conn.LdapsBind2();
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine("[-] Connection Error: {0}", e.Message);
+                        Console.WriteLine("[-] Connection Error: {0}", e.StackTrace);
+                    }
+                    conn.Dispose();
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("  [-] Exception: {0}. Skipping", e.Message);
+                }
+            }
+        }
+        private static void NovellLdapsTest(List<string> serverIds, Options options)
+        {
+            Console.WriteLine("{0}[*] LDAP SSL Channel Binding Enforcement Test", Environment.NewLine);
+
+            foreach (string serverId_s in serverIds)
+            {
+                Console.WriteLine("  [*] Testing {0}", serverId_s);
+                try
+                {
+                    LdapsTester.ChannelBindingTest(serverId_s, "", options.Username, options.Password, 636, options.Verbose);
+
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("  [-] Exception: {0}. Skipping", e.StackTrace);
+                    Debug.WriteLine(e.ToString());
+                }
+            }
+        }
+
+        private static void LdapTest(List<string> serverIds, Options options)
+        {
+            Console.WriteLine("{0}[*] LDAP SSL Enforcement Test", Environment.NewLine);
+            foreach (string serverId_s in serverIds)
+            {
+                try
+                {
+                    Console.WriteLine("  [*] Testing {0}", serverId_s);
+                    var conn = new CustomLdapConnection(serverId_s, options.Username, Environment.UserDomainName, options.Password, false, options.Verbose);
+                    int errCode = -1;
+                    try
+                    {
+                        errCode = conn.Bind();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine("  [-] Connection Error: {0}", e.Message);
                     }
                     if (errCode == 8)
                     {
-                        Console.WriteLine("[-] LDAP Signing required. That sucks...");
+                        Console.WriteLine("    [-] LDAP Signing required. That sucks...");
                     }
                     else
                     {
-                        Console.WriteLine("[-] LDAP Signing not required! Yeah!");
+                        Console.WriteLine("    [+] LDAP Signing not required! Yeah!");
                     }
                     conn.Dispose();
                 }
@@ -183,7 +190,8 @@ namespace SharpLdapRelayScan
                     Console.WriteLine("  IP Address: {0}", dc.IPAddress);
                     dcNum++;
                 }
-                if (dcNum == 0) {
+                if (dcNum == 0)
+                {
                     Console.WriteLine("  No DC found");
                 }
 

@@ -43,7 +43,7 @@ namespace SharpLdapRelayScan
                 result = AcquireCredentialsHandle(
                     WindowsIdentity.GetCurrent().Name,
                     authScheme,
-                    SecurityCredentialsOutbound,
+                    SecurityCredentialsMutual,
                     IntPtr.Zero,
                     IntPtr.Zero,
                     0,
@@ -84,6 +84,79 @@ namespace SharpLdapRelayScan
             {
                 clientToken.Dispose();
                 serverToken.Dispose();
+            }
+
+            return token;
+        }
+        public static byte[] AcquireInitialSecurityToken(SEC_WINNT_AUTH_IDENTITY_EX winnt_auth, string hostname, string authScheme, Guid requestId)
+        {
+            byte[] token = new byte[] { };
+
+            //null for initial call
+            var serverToken = new SecurityBufferDescription();
+
+            var clientToken = new SecurityBufferDescription(MaximumTokenSize);
+
+            IntPtr p_winnt_auth = Marshal.AllocHGlobal(Marshal.SizeOf<SEC_WINNT_AUTH_IDENTITY_EX>());
+            Marshal.StructureToPtr<SEC_WINNT_AUTH_IDENTITY_EX>(winnt_auth, p_winnt_auth, false);
+
+            try
+            {
+                int result;
+
+                var state = new State();
+
+                result = AcquireCredentialsHandle(
+                    null,
+                    authScheme,
+                    SecurityCredentialsMutual,
+                    IntPtr.Zero,
+                    p_winnt_auth,
+                    0,
+                    IntPtr.Zero,
+                    ref state.Credentials,
+                    ref NewLifeTime);
+
+                if (result != SuccessfulResult)
+                {
+                    // Credentials acquire operation failed.
+                    return null;
+                }
+
+                result = InitializeSecurityContext(ref state.Credentials,
+                    IntPtr.Zero,
+                    hostname,
+                    StandardContextAttributes,
+                    0,
+                    SecurityNativeDataRepresentation,
+                    ref serverToken,
+                    0,
+                    out state.Context,
+                    out clientToken,
+                    out NewContextAttributes,
+                    out NewLifeTime);
+
+
+                if (result != IntermediateResult)
+                {
+                    Console.WriteLine("Client challenge issue operation failed");
+                    // Client challenge issue operation failed.
+                    return null;
+                }
+
+                token = clientToken.GetBytes();
+                authStates.Add(requestId, state);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine("[-] Exception thrown");
+                Console.WriteLine(e.StackTrace);
+            }
+            finally
+            {
+                clientToken.Dispose();
+                serverToken.Dispose();
+                Marshal.FreeHGlobal(p_winnt_auth);
             }
 
             return token;
@@ -164,7 +237,7 @@ namespace SharpLdapRelayScan
             await Task.Delay(1000 * 60);
         }
 
-#region Native calls to secur32.dll
+        #region Native calls to secur32.dll
 
         [DllImport("secur32.dll", SetLastError = true)]
         static extern int InitializeSecurityContext(ref SecurityHandle phCredential, //PCredHandle
@@ -206,6 +279,6 @@ namespace SharpLdapRelayScan
             ref SecurityHandle phCredential, //SecHandle //PCtxtHandle ref
             ref SecurityInteger ptsExpiry); //PTimeStamp //TimeStamp ref
 
-#endregion
+        #endregion
     }
 }
