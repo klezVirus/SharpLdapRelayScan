@@ -26,7 +26,7 @@ SharpLdapRelayScan.exe -d 10.0.0.20 -u domainuser1 -p badpassword2 -m LDAPS
 
 ## Error-Based Enumeration Specifics
 
-**DISCLAIMER: ** The following sections are cloned from [https://github.com/zyn3rgy/LdapRelayScan#readme](https://github.com/zyn3rgy/LdapRelayScan#readme)
+**DISCLAIMER:** The following sections are cloned from [https://github.com/zyn3rgy/LdapRelayScan#readme](https://github.com/zyn3rgy/LdapRelayScan#readme)
 
 ### [LDAPS] Channel Binding Token Requirements
 On a Domain Controller that has been patched since [CVE-2017-8563](https://msrc.microsoft.com/update-guide/vulnerability/CVE-2017-8563), the capability to enforce LDAPS channel binding has existed. The specific policy is called `Domain Controller: LDAP server channel binding token requirements` and can be set to either `Never`, `When supported`, or `Always`. This is also [not required by default](https://msrc.microsoft.com/update-guide/en-us/vulnerability/ADV190023) (at the time of writing this). 
