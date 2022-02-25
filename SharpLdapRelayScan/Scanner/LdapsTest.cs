@@ -1,4 +1,5 @@
 ﻿using Novell.Directory.Ldap;
+using SharpLdapRelayScan.DirectoryServices;
 using System;
 
 namespace SharpLdapRelayScan
@@ -42,6 +43,63 @@ namespace SharpLdapRelayScan
 
             ldapConn.Disconnect();
         }
+        
+        
+        public static void SslSigningTest(string ldapHost, string domain, string username, string password, int ldapPort = 389, bool verbose = false)
+        {
 
+            // Creating an LdapConnection instance
+            var ldapConn = new CustomLdapConnection(ldapHost, username, Environment.UserDomainName, password, false, verbose);
+
+            Uri ldapURI = new Uri($"ldaps://{ldapHost}:{ldapPort}");
+            ldapHost = ldapURI.Host + (ldapURI.Port == 0 ? "" : ":" + ldapURI.Port);
+           
+            //Bind function will Bind the user object  Credentials to the Server
+            // Call 1 -- Check if SSL Signing is in place (valid creds required)
+            ldapConn.Bind();
+
+            // Call 2 -- Validate credentials
+            bool validCreds = Validate(ldapHost, domain, username, password, ldapPort, verbose);
+
+            if (!ldapConn.EnforceSslSigning && validCreds) {
+                Console.WriteLine("    [+] LDAP Signing not required! Yeah!");
+            } else if (!ldapConn.EnforceSslSigning) 
+            {
+                Console.WriteLine("    [/] The credentials provided seems ivalid.");
+            } 
+            else 
+            {
+                Console.WriteLine("    [-] LDAP Signing required. That sucks...");
+            }
+        }
+
+        public static bool Validate(string ldapHost, string domain, string username, string password, int ldapPort = 389, bool verbose = false) {
+            Novell.Directory.Ldap.LdapConnection ldapConn = new Novell.Directory.Ldap.LdapConnection();
+            ldapConn.Connect(ldapHost, ldapPort);
+            bool res = false;
+            // Creating DN for the user
+
+            string dn = "";
+            if (!String.IsNullOrEmpty(domain))
+            {
+                dn = string.Format("{0}@{1}", username, domain);
+            }
+            else {
+                Console.WriteLine("    [-] Failed to validate credentials. Retry with a valid Domain Name (/domain)");
+                return false;
+            }
+            try
+            {
+                ldapConn.Bind(dn, password);
+            }
+            catch (LdapException ex) {
+                if (ex.ResultCode == 8) {
+                    res = true;
+                }
+            }
+            ldapConn.Disconnect();
+            return res;
+
+        }
     }
 }

@@ -17,10 +17,12 @@ namespace SharpLdapRelayScan.DirectoryServices
         private IntPtr lpLastError;
         private SEC_WINNT_AUTH_IDENTITY_EX identity;
         private bool verbose;
+        public bool EnforceSslSigning;
 
         public CustomLdapConnection(string server, string username, string domain, string password, bool ssl = false, bool verbose = false)
         {
 
+            this.EnforceSslSigning = false;
             LdapDirectoryIdentifier serverId;
             this.verbose = verbose;
             this.server = server + (ssl ? ":636" : "");
@@ -92,10 +94,17 @@ namespace SharpLdapRelayScan.DirectoryServices
 
             Wldap32.ldap_get_option_errorstring(ldapHandle, LdapOption.LDAP_OPT_SERVER_ERROR, out lpLastError);
 
+            string lastErrorMessage = Marshal.PtrToStringAuto(lpLastError);
+
             if (this.verbose) { 
                 Console.WriteLine("    [DEBUG] RET CODE: {0}", num);
-                Console.WriteLine("    [DEBUG] LAST ERR: {0}", Marshal.PtrToStringAuto(lpLastError));
+                Console.WriteLine("    [DEBUG] LAST ERR: {0}", lastErrorMessage);
             }
+
+            if (num == 8) {
+                this.EnforceSslSigning = true;
+            }
+
             return num;
         }
 

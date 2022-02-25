@@ -66,6 +66,7 @@ namespace Novell.Directory.Ldap
 
         private NtlmChallenge ntlmChallenge;
         public int ldapEnforceChannelBinding;
+        private bool lastErrCode;
         private bool verbose;
 
         private void InitBlock()

@@ -1,9 +1,9 @@
-﻿using CommandLine;
-using SharpLdapRelayScan.DirectoryServices;
+﻿using SharpLdapRelayScan.DirectoryServices;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.DirectoryServices.ActiveDirectory;
+using System.Linq;
 using System.Net;
 
 namespace SharpLdapRelayScan
@@ -13,34 +13,100 @@ namespace SharpLdapRelayScan
 
         public enum CheckMethods
         {
+            Ldap,
             Ldaps,
             Both
         }
 
         public class Options
         {
-            [Option('v', "verbose", Required = false, HelpText = "Set output to verbose messages")]
+            public Options() {
+                Verbose = false;
+                Method = "BOTH";
+                Username = Environment.UserName;
+                Domain = Environment.UserDomainName;
+                DomainController = Password = null;
+            }
+
             public bool Verbose { get; set; }
-
-            [Option('d', "dcip", Required = false, HelpText = "DNS Nameserver on network. Any DC's IPv4 address should work")]
             public string DomainController { get; set; }
-
-            [Option('u', "user", Required = false,  HelpText = "Domain User")]
+            public string Domain { get; set; }
             public string Username { get; set; }
-
-            [Option('p', "password", Required = true, HelpText = "Domain User's Password")]
             public string Password { get; set; }
-
-            [Option('m', "method", Required = false, Default = "Both", HelpText = "LDAPS or BOTH - LDAPS checks for channel binding, BOTH checks for LDAP signing and LDAP channel binding [authentication required]")]
             public string Method { get; set; }
+        }
+
+        static void PrintHelp() {
+            string helpText = @"
+#### SharpRelayLdapScan -- by klezVirus
+
+  -v, --verbose     Set output to verbose messages
+  -d, --dcip        DNS Nameserver on network. Any DC's IPv4 address should work
+  -u, --user        Domain User
+  -p, --password    Required. Domain User's Password
+  -m, --method      (Default: Both) LDAP, LDAPS or BOTH - LDAPS checks for channel binding,
+                    LDAP for signing and BOTH... both
+  --help            Display this help screen.
+  --version         Display version information.";
+            Console.WriteLine(helpText);
+
         }
 
         static void Main(string[] args)
         {
-            Parser.Default.ParseArguments<Options>(args)
-                .WithParsed(RunOptions)
-                .WithNotParsed(HandleParseError);
+            Options opts = new Options();
 
+            string[] allowedMethods = new string[] { "ldap", "ldaps", "both" };
+
+
+            foreach (var entry in args.Select((value, index) => new { index, value }))
+            {
+                string argument = entry.value.ToUpper().Replace("--", "/").Replace("-", "/");
+
+                switch (argument)
+                {
+                    case "/V":
+                    case "/VERBOSE":
+                        opts.Verbose = true;
+                        break;
+
+                    case "/M":
+                    case "/METHOD":
+                        var method = args[entry.index + 1];
+                        if (!String.IsNullOrEmpty(method) && allowedMethods.Contains<string>(method.ToLowerInvariant())) {
+                            opts.Method = method;
+                        }
+                        break;
+                        
+                    case "/U":
+                    case "/USER":
+                        opts.Username = args[entry.index + 1];
+                        break;
+
+                    case "/P":
+                    case "/PASSWORD":
+                        opts.Password = args[entry.index + 1];
+                        break;
+                    case "/D":
+                    case "/DOMAIN":
+                        opts.Domain = args[entry.index + 1];
+                        break;
+                    case "/DC":
+                        opts.DomainController = args[entry.index + 1];
+                        break;
+                    case "/H":
+                    case "/HELP":
+                        PrintHelp();
+                        return;
+                }
+            }
+
+            if (String.IsNullOrEmpty(opts.Password)) {
+                Console.WriteLine("[-] A Password needs to be specified");
+                return;
+            }
+
+            RunOptions(opts);
         }
 
         static void RunOptions(Options opts)
@@ -77,11 +143,14 @@ namespace SharpLdapRelayScan
 
             switch (method)
             {
-                case CheckMethods.Both:
+                case CheckMethods.Ldap:
                     LdapTest(serverIds, opts);
-                    NovellLdapsTest(serverIds, opts);
                     break;
                 case CheckMethods.Ldaps:
+                    NovellLdapsTest(serverIds, opts);
+                    break;
+                case CheckMethods.Both:
+                    LdapTest(serverIds, opts);
                     NovellLdapsTest(serverIds, opts);
                     break;
                 default:
@@ -96,7 +165,7 @@ namespace SharpLdapRelayScan
                 try
                 {
                     Console.WriteLine("[*] Testing {0}", serverId_s);
-                    var conn = new CustomLdapConnection(serverId_s, options.Username, Environment.UserDomainName, options.Password, true);
+                    var conn = new CustomLdapConnection(serverId_s, options.Username, options.Domain, options.Password, true);
                     int errCode = -1;
                     try
                     {
@@ -137,41 +206,26 @@ namespace SharpLdapRelayScan
         private static void LdapTest(List<string> serverIds, Options options)
         {
             Console.WriteLine("{0}[*] LDAP SSL Enforcement Test", Environment.NewLine);
+
             foreach (string serverId_s in serverIds)
             {
+                Console.WriteLine("  [*] Testing {0}", serverId_s);
                 try
                 {
-                    Console.WriteLine("  [*] Testing {0}", serverId_s);
-                    var conn = new CustomLdapConnection(serverId_s, options.Username, Environment.UserDomainName, options.Password, false, options.Verbose);
-                    int errCode = -1;
-                    try
-                    {
-                        errCode = conn.Bind();
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine("  [-] Connection Error: {0}", e.Message);
-                    }
-                    if (errCode == 8)
-                    {
-                        Console.WriteLine("    [-] LDAP Signing required. That sucks...");
-                    }
-                    else
-                    {
-                        Console.WriteLine("    [+] LDAP Signing not required! Yeah!");
-                    }
-                    conn.Dispose();
+                    LdapsTester.SslSigningTest(serverId_s, options.Domain, options.Username, options.Password, 389, options.Verbose);
+
                 }
-                catch
+                catch (Exception e)
                 {
-                    Console.WriteLine("  [-] Exception: Skipping");
+                    Console.WriteLine("  [-] Exception: {0}. Skipping", e.StackTrace);
+                    Debug.WriteLine(e.ToString());
                 }
             }
         }
 
-        static void HandleParseError(IEnumerable<Error> errs)
+        static void HandleParseError(IEnumerable<Exception> errs)
         {
-            foreach (Error err in errs)
+            foreach (Exception err in errs)
             {
                 Console.Error.WriteLine(err.ToString());
             }

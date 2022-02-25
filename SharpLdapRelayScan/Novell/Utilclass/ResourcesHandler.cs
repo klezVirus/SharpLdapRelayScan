@@ -199,6 +199,10 @@ namespace Novell.Directory.Ldap.Utilclass
             {
                 result = getMessage(ExceptionMessages.UNKNOWN_RESULT, new Object[] { code }, locale);
             }
+            catch (Exception e) {
+
+                result = Convert.ToString(code);
+            }
             return result;
         }
 
