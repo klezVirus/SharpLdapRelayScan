@@ -2,7 +2,7 @@
 
 SharLdapRealyScan is a tool to check Domain Controllers for LDAP server protections regarding the relay of NTLM authentication, and it's a C# port of [LdapRelayScan](https://github.com/zyn3rgy/LdapRelayScan).
 
-If you're interested in WHY I develped this, check it out the relative [blog post]. 
+If you're interested in WHY I develped this, check it out the relative [blog post](https://klezvirus.github.io/RedTeaming/Development/ImplementingLDAPScanner/). 
 
 If you're interested in the specifics of the error-based enumeration, see the explaination [below](https://github.com/klezVirus/SharpLdapRelayScan#error-based-enumeration-specifics). 
 
